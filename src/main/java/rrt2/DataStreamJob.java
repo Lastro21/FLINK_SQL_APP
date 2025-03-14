@@ -10,7 +10,6 @@ public final class DataStreamJob {
     private static final StreamExecutionEnvironment ENV = StreamExecutionEnvironment.getExecutionEnvironment();
     private static final StreamTableEnvironment TABLE_ENV = StreamTableEnvironment.create(ENV);
 
-    private static final String SQL_SELECT = "SELECT message FROM KafkaTable";
     private static final String KAFKA_TABLE_DDL = "CREATE TABLE KafkaTable (" +
             "`message` STRING" +
             ") WITH (" +
@@ -23,6 +22,7 @@ public final class DataStreamJob {
             "'format'='raw'," +
             "'scan.startup.mode'='group-offsets'" +
             ")";
+    private static final String SQL_SELECT = "SELECT message FROM KafkaTable";
 
     public static void main(String[] args) throws Exception {
 

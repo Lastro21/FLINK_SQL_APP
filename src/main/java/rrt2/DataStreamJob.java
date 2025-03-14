@@ -32,5 +32,4 @@ public final class DataStreamJob {
         ENV.execute("Flink Kafka SQL Example");
 
     }
-
 }

@@ -1,6 +1,7 @@
 package rrt2;
 
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 
@@ -40,7 +41,21 @@ public final class DataStreamJob {
                 ")";
         TABLE_ENV.executeSql(postgresSinkDDL);
 
-        final String insertQuery = "INSERT INTO postgresTable SELECT id, message FROM KafkaTable";
+        // Функция для проверки и преобразования id в INT
+        Table resultTable = TABLE_ENV.sqlQuery(
+                "SELECT " +
+                        "CASE " +
+                        "  WHEN CAST(id AS INT) IS NOT NULL THEN CAST(id AS INT) " +
+                        "  ELSE NULL " +
+                        "END AS id, " +
+                        "message " +
+                        "FROM KafkaTable " +
+                        "WHERE CAST(id AS INT) IS NOT NULL"
+        );
+
+        TABLE_ENV.createTemporaryView("FilteredKafkaTable", resultTable);
+
+        final String insertQuery = "INSERT INTO postgresTable SELECT id, message FROM FilteredKafkaTable";
         TABLE_ENV.executeSql(insertQuery);
 
         ENV.execute("Flink Kafka SQL Example");

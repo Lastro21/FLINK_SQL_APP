@@ -16,26 +16,27 @@ public final class DataStreamJob {
                 "`message` STRING" +
                 ") WITH (" +
                 "'connector'='kafka'," +
-                "'topic'='my_topic2'," +
+                "'topic'='my_topic'," +
                 "'properties.bootstrap.servers'='localhost:9092'," +
                 "'properties.group.id'='flink-kafka-consumer-group'," +
                 "'properties.enable.auto.commit'='true'," +
                 "'properties.auto.commit.interval.ms'='500'," +
                 "'format'='json'," +
                 "'json.ignore-parse-errors'='true'," +
-                "'scan.startup.mode'='group-offsets'" +
+                "'scan.startup.mode'='latest-offset'" +
                 ")";
         TABLE_ENV.executeSql(KAFKA_TABLE_DDL);
 
         final String postgresSinkDDL = "CREATE TABLE postgresTable (" +
                 "id INT," +
-                "message STRING" +
+                "message STRING," +
+                "PRIMARY KEY (id) NOT ENFORCED" +
                 ") WITH (" +
                 "'connector'='jdbc'," +
                 "'url'='jdbc:postgresql://localhost:5432/postgres'," +
                 "'table-name'='real_table'," +
                 "'username'='postgres'," +
-                "'password'='password'" +
+                "'password'='postgres'" +
                 ")";
         TABLE_ENV.executeSql(postgresSinkDDL);
 

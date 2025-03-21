@@ -4,7 +4,7 @@ id INT,
 message STRING
 ) WITH (
       'connector' = 'kafka',
-      'topic' = 'my_topic',
+      'topic' = '{{flink.source.kafka.topic}}',
       'properties.bootstrap.servers' = 'localhost:9092',
       'properties.group.id' = 'flink-kafka-consumer-group',
       'properties.enable.auto.commit' = 'true',
@@ -21,10 +21,10 @@ message STRING,
 PRIMARY KEY (id) NOT ENFORCED
 ) WITH (
       'connector' = 'jdbc',
-      'url' = 'jdbc:postgresql://localhost:5432/postgres',
+      'url' = '{{flink.sink.postgresql.url}}',
       'table-name' = 'real_table',
       'username' = 'postgres',
-      'password' = 'postgres'
+      'password' = '{{flink.sink.postgresql.password}}'
       );
 
 -- Создание временного представления FilteredKafkaTable

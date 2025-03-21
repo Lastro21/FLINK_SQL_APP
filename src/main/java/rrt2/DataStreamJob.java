@@ -1,5 +1,7 @@
 package rrt2;
 
+import io.prometheus.metrics.exporter.httpserver.HTTPServer;
+import io.prometheus.metrics.instrumentation.jvm.JvmMetrics;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 
@@ -9,11 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class DataStreamJob {
+
+    private static final Logger LOGGER = Logger.getLogger(String.valueOf(DataStreamJob.class));
 
     private static final String SQL_SOURCE_FILE = "/home/name/Desktop/application_test/FLINK_SQL_APP2/src/main/java/rrt2/flinkApplication.sql";
     private static final String SQL_PARAMS_FILE = "/home/name/Desktop/application_test/FLINK_SQL_APP2/src/main/java/rrt2/sqlParams.txt";
@@ -22,14 +27,16 @@ public final class DataStreamJob {
     private static final EnvironmentSettings FLINK_ENV_SETTINGS = EnvironmentSettings.newInstance().inStreamingMode().build();
     private static final TableEnvironment FLINK_TABLE_ENV = TableEnvironment.create(FLINK_ENV_SETTINGS);
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
+
+        initMetrics();
 
         fillParamsSQL();
 
         String sourceSQL;
 
-        try (InputStream inputStream = Files.newInputStream(Paths.get(SQL_SOURCE_FILE));
-             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+        try (final InputStream inputStream = Files.newInputStream(Paths.get(SQL_SOURCE_FILE));
+             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             sourceSQL = reader.lines().collect(Collectors.joining("\n"));
         } catch (final IOException exception) {
             throw new RuntimeException("ERROR reading file SQL_SOURCE_FILE : " + SQL_SOURCE_FILE, exception);
@@ -40,6 +47,16 @@ public final class DataStreamJob {
         for (final String statement : resultSQL.split(";")) {
             FLINK_TABLE_ENV.executeSql(statement);
         }
+    }
+
+    public static void initMetrics() throws IOException {
+        JvmMetrics.builder().register();
+
+        final HTTPServer server = HTTPServer.builder()
+                .port(9400)
+                .buildAndStart();
+
+        LOGGER.info("HTTPServer listening on http://localhost:" + server.getPort() + "/metrics");
     }
 
     public static Map<String, String> fillParamsSQL() {

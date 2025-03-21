@@ -2,7 +2,7 @@ mvn archetype:generate -DarchetypeGroupId=org.apache.flink -DarchetypeArtifactId
 
 
 ==============================================================
-flink_application.sql
+flinkApplication.sql
 
 -- Создаем таблицу для чтения данных из Kafka
 CREATE TABLE kafka_source (
@@ -114,7 +114,7 @@ public static void main(String[] args) throws Exception {
 EnvironmentSettings settings = EnvironmentSettings.newInstance().inStreamingMode().build();
 TableEnvironment tableEnv = TableEnvironment.create(settings);
 
-        String sqlFilePath = "src/main/resources/flink_application.sql";
+        String sqlFilePath = "src/main/resources/flinkApplication.sql";
         String sql = new String(Files.readAllBytes(Paths.get(sqlFilePath)));
         
         for (String statement : sql.split(";")) {

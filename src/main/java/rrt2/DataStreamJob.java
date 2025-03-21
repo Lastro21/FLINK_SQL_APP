@@ -3,15 +3,15 @@ package rrt2;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class DataStreamJob {
 
@@ -26,7 +26,15 @@ public final class DataStreamJob {
 
         fillParamsSQL();
 
-        final String sourceSQL = new String(Files.readAllBytes(Paths.get(SQL_SOURCE_FILE)));
+        String sourceSQL;
+
+        try (InputStream inputStream = Files.newInputStream(Paths.get(SQL_SOURCE_FILE));
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            sourceSQL = reader.lines().collect(Collectors.joining("\n"));
+        } catch (final IOException exception) {
+            throw new RuntimeException("ERROR reading file SQL_SOURCE_FILE : " + SQL_SOURCE_FILE, exception);
+        }
+
         final String resultSQL = replaceTemplate(sourceSQL);
 
         for (final String statement : resultSQL.split(";")) {
@@ -42,7 +50,7 @@ public final class DataStreamJob {
                 if (charIndex != -1) {
                     SQL_PARAMS.put(line.trim().substring(0, charIndex), line.trim().substring(charIndex + 1, line.length()));
                 } else {
-                    System.exit(1);
+                    throw new RuntimeException("ERROR reading file SQL_PARAMS_FILE");
                 }
             }
         } catch (final IOException exception) {

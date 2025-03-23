@@ -105,11 +105,6 @@
 <!--        metrics-->
         <dependency>
             <groupId>io.prometheus</groupId>
-            <artifactId>prometheus-metrics-core</artifactId>
-            <version>1.3.6</version>
-        </dependency>
-        <dependency>
-            <groupId>io.prometheus</groupId>
             <artifactId>prometheus-metrics-instrumentation-jvm</artifactId>
             <version>1.3.6</version>
         </dependency>

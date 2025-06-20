@@ -1,94 +1,46 @@
 package rrt2;
 
-import io.prometheus.metrics.exporter.httpserver.HTTPServer;
-import io.prometheus.metrics.instrumentation.jvm.JvmMetrics;
+import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.TableEnvironment;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import org.apache.flink.types.Row;
 
 public final class DataStreamJob {
 
-    private static final Logger LOGGER = Logger.getLogger(String.valueOf(DataStreamJob.class));
-
-    private static final String SQL_SOURCE_FILE = "/home/name/Desktop/application_test/FLINK_SQL_APP2/src/main/java/rrt2/flinkApplication.sql";
-    private static final String SQL_PARAMS_FILE = "/home/name/Desktop/application_test/FLINK_SQL_APP2/src/main/java/rrt2/sqlParams.txt";
-    private static final char SEPARATOR = '=';
-    private static final Map<String, String> SQL_PARAMS = new HashMap<>();
     private static final EnvironmentSettings FLINK_ENV_SETTINGS = EnvironmentSettings.newInstance().inStreamingMode().build();
     private static final TableEnvironment FLINK_TABLE_ENV = TableEnvironment.create(FLINK_ENV_SETTINGS);
 
-    public static void main(final String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-        initMetrics();
+        // 1. Создание таблицы с JDBC коннектором
+        FLINK_TABLE_ENV.executeSql(
+                "CREATE TABLE postgres_sink (\n" +
+                        "    id INT,\n" +
+                        "    name STRING,\n" +
+                        "    description STRING,\n" +
+                        "    PRIMARY KEY (id) NOT ENFORCED\n" +
+                        ") WITH (\n" +
+                        "    'connector' = 'jdbc',\n" +
+                        "    'url' = 'jdbc:postgresql://localhost:5432/postgres',\n" +
+                        "    'table-name' = 'your_table22',\n" +
+                        "    'username' = 'postgres',\n" +
+                        "    'password' = 'password*',\n" +
+                        "    'driver' = 'org.postgresql.Driver'\n" +
+                        ")"
+        );
 
-        fillParamsSQL();
+// 2. Вставка данных через Table API (без SQL)
+        Table dataTable = FLINK_TABLE_ENV.fromValues(
+                DataTypes.ROW(
+                        DataTypes.FIELD("id", DataTypes.INT()),
+                        DataTypes.FIELD("name", DataTypes.STRING()),
+                        DataTypes.FIELD("description", DataTypes.STRING())
+                ),
+                Row.of(5, "Test Name551", "This is a test description5")
+        );
 
-        String sourceSQL;
-
-        try (final InputStream inputStream = Files.newInputStream(Paths.get(SQL_SOURCE_FILE));
-             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            sourceSQL = reader.lines().collect(Collectors.joining("\n"));
-        } catch (final IOException exception) {
-            throw new RuntimeException("ERROR reading file SQL_SOURCE_FILE : " + SQL_SOURCE_FILE, exception);
-        }
-
-        final String resultSQL = replaceTemplate(sourceSQL);
-
-        for (final String statement : resultSQL.split(";")) {
-            FLINK_TABLE_ENV.executeSql(statement);
-        }
-    }
-
-    public static void initMetrics() throws IOException {
-        JvmMetrics.builder().register();
-
-        final HTTPServer server = HTTPServer.builder()
-                .port(9400)
-                .buildAndStart();
-
-        LOGGER.info("HTTPServer listening on http://localhost:" + server.getPort() + "/metrics");
-    }
-
-    public static Map<String, String> fillParamsSQL() {
-        try (final BufferedReader br = new BufferedReader(new FileReader(SQL_PARAMS_FILE))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                int charIndex = line.trim().indexOf(SEPARATOR);
-                if (charIndex != -1) {
-                    SQL_PARAMS.put(line.trim().substring(0, charIndex), line.trim().substring(charIndex + 1, line.length()));
-                } else {
-                    throw new RuntimeException("ERROR reading file SQL_PARAMS_FILE");
-                }
-            }
-        } catch (final IOException exception) {
-            exception.printStackTrace();
-        }
-        return SQL_PARAMS;
-    }
-
-    public static String replaceTemplate(final String content) {
-
-        final Pattern pattern = Pattern.compile("\\{\\{(.*?)\\}\\}");
-        final Matcher matcher = pattern.matcher(content);
-        final StringBuffer result = new StringBuffer();
-
-        while (matcher.find()) {
-            final String key = matcher.group(1);
-            final String value = SQL_PARAMS.getOrDefault(key, "");
-            matcher.appendReplacement(result, value);
-        }
-        matcher.appendTail(result);
-
-        return result.toString();
+// 3. Выполнение вставки
+        dataTable.executeInsert("postgres_sink");
     }
 }

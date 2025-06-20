@@ -11,13 +11,13 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.20.1</flink.version>
+        <flink.version>2.0.0</flink.version>
         <target.java.version>17</target.java.version>
         <scala.binary.version>2.12</scala.binary.version>
         <maven.compiler.source>${target.java.version}</maven.compiler.source>
         <maven.compiler.target>${target.java.version}</maven.compiler.target>
         <log4j.version>2.24.3</log4j.version>
-        <flink.connector.kafka>3.4.0-1.20</flink.connector.kafka>
+        <flink.connector.kafka>4.0.0-2.0</flink.connector.kafka>
     </properties>
 
     <dependencies>
@@ -27,12 +27,12 @@
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-connector-base</artifactId>
-                    <version>${flink.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-base</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!--        Tables-->
         <dependency>
@@ -48,39 +48,63 @@
             <scope>provided</scope>
         </dependency>
         <!--        Tables-->
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-clients</artifactId>
-                    <version>${flink.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-connector-kafka</artifactId>
-                    <version>${flink.connector.kafka}</version>
-                    <scope>provided</scope>
-                </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka</artifactId>
+            <version>${flink.connector.kafka}</version>
+            <scope>provided</scope>
+        </dependency>
 
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-json</artifactId>
-                    <version>${flink.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-json</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!--Postgresql-->
-                <dependency>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-connector-jdbc</artifactId>
-                    <version>3.2.0-1.19</version>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                    <version>42.7.5</version>
-                    <scope>provided</scope>
-                </dependency>
+
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.flink</groupId>-->
+        <!--            <artifactId>flink-connector-jdbc</artifactId>-->
+        <!--            <version>3.3.0-1.20</version>-->
+        <!--            <scope>provided</scope>-->
+        <!--        </dependency>-->
+
+
+<!--        <dependency>-->
+<!--            <groupId>org.apache.flink</groupId>-->
+<!--            <artifactId>flink-connector-jdbc-postgres</artifactId>-->
+<!--            <version>4.0.0</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-jdbc-core</artifactId>
+            <version>4.0.0-2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-jdbc</artifactId>
+            <version>3.3.0-1.20</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.7</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!--        Logging-->
         <dependency>
@@ -102,7 +126,7 @@
             <scope>runtime</scope>
         </dependency>
 
-<!--        metrics-->
+        <!--        metrics-->
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>prometheus-metrics-instrumentation-jvm</artifactId>

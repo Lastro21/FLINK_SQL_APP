@@ -1,6 +1,5 @@
 package rrt2;
 
-
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 
@@ -25,11 +24,10 @@ public final class DataStreamJob {
                 "    'driver' = 'org.postgresql.Driver'\n" +
                 ");" +
                 "INSERT INTO postgres_sink\n" +
-                "VALUES (2, 'Test Name2', 'This is a test description2');";
+                "VALUES (1, 'Test Name42', 'This is a test description42');";
 
         for (final String statement : resultSQL.split(";")) {
             FLINK_TABLE_ENV.executeSql(statement);
         }
-
     }
 }

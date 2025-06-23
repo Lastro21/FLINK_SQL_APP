@@ -20,8 +20,8 @@ public final class DataStreamJob {
 
     private static final Logger LOGGER = Logger.getLogger(String.valueOf(DataStreamJob.class));
 
-    private static final String SQL_SOURCE_FILE = "/home/name/Desktop/application_test/FLINK_SQL_APP2/src/main/java/rrt2/flinkApplication.sql";
-    private static final String SQL_PARAMS_FILE = "/home/name/Desktop/application_test/FLINK_SQL_APP2/src/main/java/rrt2/sqlParams.txt";
+    private static final String SQL_SOURCE_FILE = "/home/tokkpasha/Downloads/flinkApplication.sql";
+    private static final String SQL_PARAMS_FILE = "/home/tokkpasha/Downloads/sqlParams.txt";
     private static final char SEPARATOR = '=';
     private static final Map<String, String> SQL_PARAMS = new HashMap<>();
     private static final EnvironmentSettings FLINK_ENV_SETTINGS = EnvironmentSettings.newInstance().inStreamingMode().build();
